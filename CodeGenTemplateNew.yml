@@ -1,0 +1,307 @@
+#Template for Code Generation (Created on: 2/1/2022)
+#Template Version: 1.1.0
+ElementDefinition:
+- Device: Axis
+  Parameters:
+  - DisplayName: Movement Position
+    Type: String
+    Content: 
+    Value: 
+  - DisplayName: Positioning
+    Type: Choice
+    Content:
+    - Absolute Position
+    - Relative Position
+    Value: 
+  - DisplayName: Duration of Movement
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: down
+    Code: >-
+      Devices.{DeviceName}.Auto.Speed := A.Controller.Override;
+      		Devices.{DeviceName}.Auto.Position := #{Movement Position}#;
+      		Devices.{DeviceName}.Auto.Command := AXS_NcAxisCommand.Move{Positioning};
+      		Devices.{DeviceName}.Command := LAS_{Lasertype}_Command.{Laserprocess};
+- Device: Cylinder
+  Parameters:
+  - DisplayName: Movement Position
+    Type: String
+    Content: 
+    Value: 
+  - DisplayName: Duration of Movement
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: down
+    Code: Devices.{DeviceName}.Command := CYL_Command.MoveTo{Movement Position};
+- Device: Laser
+  Parameters:
+  - DisplayName: Type of Laser
+    Type: Choice
+    Content:
+    - Keyence
+    - Trumpf
+    - Datalogic
+    - Cab
+    - Other
+    Value: 
+  - DisplayName: Laser Process
+    Type: Choice
+    Content:
+    - Start Program
+    - Load Program
+    Value: 
+  - DisplayName: Duration of the Laser Process
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode: 
+- Device: Scara Robot
+  Parameters:
+  - DisplayName: Movement Process
+    Type: Choice
+    Content:
+    - Jump
+    - Move
+    - Go
+    Value: 
+  - DisplayName: Movement Position
+    Type: String
+    Content: 
+    Value: 
+  - DisplayName: Duration of Movement
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: down
+    Code: >-
+      Devices.{DeviceName}.TargetPosition := #{Movement Position}#;
+      		Devices.{DeviceName}.TargetPosition.Speed := Controller.Override;
+      		Devices.{DeviceName}.Interpolation := ROB_EpsonInterpolation.{Movement Process};
+      		Devices.{DeviceName}.Command := ROB_EpsonCommand.StartTrajektorie
+- Device: 6-Axis Robot
+  Parameters:
+  - DisplayName: Movement Position
+    Type: String
+    Content: 
+    Value: 
+  - DisplayName: Duration of Movement
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: down
+    Code: >-
+      Devices.{DeviceName}.Trajektorie[1] := #{Movement Position}#;
+      		Devices.{DeviceName}.Trajektorie[1].CNT := USINT#0;
+      		Devices.{DeviceName}.Trajektorie[1].ACC := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[1].Velocity := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[1].Interpolation := ROB_FanucInterpolation.#;
+      		Devices.{DeviceName}.Trajektorie[1].Aktiviert := TRUE;
+
+      		Devices.{DeviceName}.Trajektorie[2] := #{Movement Position}#;
+      		Devices.{DeviceName}.Trajektorie[2].CNT := USINT#0;
+      		Devices.{DeviceName}.Trajektorie[2].ACC := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[2].Velocity := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[2].Interpolation := ROB_FanucInterpolation.#;
+      		Devices.{DeviceName}.Trajektorie[2].Aktiviert := TRUE;
+
+      		Devices.{DeviceName}.Trajektorie[3] := #{Movement Position}#;
+      		Devices.{DeviceName}.Trajektorie[3].CNT := USINT#0;
+      		Devices.{DeviceName}.Trajektorie[3].ACC := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[3].Velocity := Controller.Override;
+      		Devices.{DeviceName}.Trajektorie[3].Interpolation := ROB_FanucInterpolation.#;
+      		Devices.{DeviceName}.Trajektorie[3].Aktiviert := TRUE;
+      		Devices.{DeviceName}.Command := ROB_FanucCommand.StartTrajektorie;
+      		Devices.{DeviceName}.ProgNumber := USINT#10;
+  - Name: top
+    Code: >-
+      Devices.{DeviceName}.Trajektorie[1].Aktiviert := FALSE;
+      		Devices.{DeviceName}.Trajektorie[2].Aktiviert := FALSE;
+      		Devices.{DeviceName}.Trajektorie[3].Aktiviert := FALSE;
+- Device: Vision Sensor
+  Parameters:
+  - DisplayName: Type of Vision Sensor
+    Type: Choice
+    Content:
+    - Keyence
+    - Sensorpart
+    - Datalogic
+    - Balluff
+    - Other
+    Value: 
+  - DisplayName: Process of Vision Sensor
+    Type: Choice
+    Content:
+    - Start Program
+    - Load Program
+    Value: 
+  - DisplayName: Duration of the Monitoring
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: Balluff_Load Program
+    Code: >-
+      Devices.{DeviceName}.Job := #;
+      		Devices.{DeviceName}.Command := CAM_BVS_COMMAND.SetScriptId;
+  - Name: Balluff_Start Program
+    Code: Devices.VS1.Command := CAM_BVS_COMMAND.Start;
+  - Name: Datalogic_Load Program
+    Code: ''
+  - Name: Datalogic_Start Program
+    Code: ''
+  - Name: Keyence_Load Program
+    Code: 'Devices.{DeviceName}.ProgramNumber := #;'
+  - Name: Keyence_Start Program
+    Code: 'Devices.{DeviceName}.ProgramNumber := #;'
+  - Name: Sensorpart_Load Program
+    Code: >-
+      Devices.{DeviceName}.Job := #;
+      		Devices.{DeviceName}.Command := CAM_SVS_COMMAND.SetProgram;
+  - Name: Sensorpart_Start Program
+    Code: Devices.{DeviceName}.Command := CAM_SVS_COMMAND.Start;
+  - Name: Other_Load Program
+    Code: >-
+      Devices.{DeviceName}.Job := #;
+      		Devices.{DeviceName}.Command := CAM_#_COMMAND.#;
+  - Name: Other_Start Program
+    Code: Devices.{DeviceName}.Command := CAM_#_COMMAND.Start;
+- Device: Weasel
+  Parameters:
+  - DisplayName: Movement Position
+    Type: Choice
+    Content:
+    - Preposition Workingposition 1
+    - Workingposition 1
+    - Preposition Workingposition 2
+    - Workingposition 2
+    Value: 
+  - DisplayName: Duration of Movement
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode:
+  - Name: Preposition Workingposition 1
+    Code: >-
+      Devices.{DeviceName}.EnableWP_1 := FALSE;
+      		Devices.{DeviceName}.Command := WSL_Command.MoveToWP_1;
+  - Name: Workingposition 1
+    Code: >-
+      Devices.{DeviceName}.EnableWP_1 := TRUE;
+      		Devices.{DeviceName}.Command := WSL_Command.MoveToWP_1;
+  - Name: Preposition Workingposition 2
+    Code: >-
+      Devices.{DeviceName}.EnableWP_2 := FALSE;
+      		Devices.{DeviceName}.Command := WSL_Command.MoveToWP_2;
+  - Name: Workingposition 2
+    Code: >-
+      Devices.{DeviceName}.EnableWP_2 := TRUE;
+      		Devices.{DeviceName}.Command := WSL_Command.MoveToWP_2;
+- Device: OtherDevice
+  Parameters:
+  - DisplayName: Duration
+    Type: String
+    Content: 
+    Value: 
+  DeviceCode: 
+TemplateDefinition:
+- DisplayName: IFHeader
+  Data: 'Devices.{DeviceName}.Done AND NOT Devices.{DeviceName}.Error '
+- DisplayName: ELSEIFHeader
+  Data: 'Devices.{DeviceName}.HasError() '
+- DisplayName: ELSEBody
+  Data: ''
+- DisplayName: AutoStartTrueBody
+  Data: Devices.{DeviceName}.AutoStart := TRUE;
+- DisplayName: AutoStartFalseBody
+  Data: Devices.{DeviceName}.AutoStart := FALSE;
+- DisplayName: MainCodeBody
+  Data: >-
+    {Step}:
+    	StepDescription.Value := '{FunctionName}';
+    		{codeDeviceTop}
+    	IF 	{codeIFHeader} THEN
+    		{codeIFAutoStartBody}
+    		PauseAllowed := TRUE;
+    		Step := {NextStep};
+    	ELSIF {codeELSEIFHeader} THEN
+    		{codeELSEIFAutoStartBody}
+    		PauseAllowed := TRUE;
+    	ELSE
+    		{codeDevice}
+    		{codeELSE}
+    		{codeELSEAutoStartBody}
+    	END_IF
+- DisplayName: StartCodeBody
+  Data: >+
+    SUPER^(Logger:=Logger,Controller := Controller,);
+
+
+    CASE Step OF
+
+
+    (*-----------------------------------------------------------------------------*)
+
+    // -- Beginn Grundstellung
+
+    INITIAL: 
+    	StepDescription.Value := 'Grundstellung: Wartezeit';
+    	StepMonitoring.Timeout := T#100MS;
+    	IF StepMonitoring.TimeoutReached THEN
+    		PauseAllowed := TRUE;
+    		Step := 100;
+    	END_IF
+
+    #GrundstellungsfahrtErgaenzen#
+
+
+    (*-----------------------------------------------------------------------------*)
+
+    999:
+    	StepDescription.Value := 'Grundstellung: Grundstellung erreicht.';
+    	AtHome := TRUE;
+    	Step := STARTOFCYCLE
+
+    (*----------------------------------------------------------------------------*)
+
+    // -- Beginn Automatikbetrieb
+
+    STARTOFCYCLE:
+    	StepDescription.Value := '{FunctionName}';
+    	Step := {NextStep};
+    	PauseAllowed := TRUE;
+
+- DisplayName: EndCodeBody
+  Data: >-
+    {Step}:
+    	StepDescription.Value:= '{FunctionName}';
+    		Devices.CycleTimer.Stop();
+    		AtCycleEnd:= TRUE;
+    		Step:= STARTOFCYCLE;
+    ELSE
+    		IF Step > INITIAL THEN
+    			ConfirmMessage(1, '');
+    			PauseAllowed := TRUE;
+    			StepDescription.Value := 'Bitte lächeln';
+    		END_IF
+    	END_CASE
+
+    SUPER^.PostSequence(Logger:=Logger,Controller := Controller,);
+- DisplayName: SECodeBody
+  Data: >-
+    {Step}:
+    	StepDescription.Value:= '{FunctionName}';
+    	IF 	{SEIFHeader} THEN
+    		Step := {NextStep};
+    	ELSE
+    		PauseAllowed := TRUE
+    	END_IF
+- DisplayName: SemaphoreIFHeader
+  Data: 'Handshakes.{FunctionName}.getClearance() '
+- DisplayName: EventIFHeader
+  Data: '#Bedingung# '
